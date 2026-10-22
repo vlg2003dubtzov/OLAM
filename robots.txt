@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://vlg2003dubtzov.github.io/olam/sitemap.xml
