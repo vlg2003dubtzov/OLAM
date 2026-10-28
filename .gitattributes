@@ -22,4 +22,5 @@
 *.ttf binary
 *.otf binary
 *.dll binary
+# Исходники Rodin — в Git LFS: файлы до 200+ МБ, обычный git на GitHub их не примет
 Assets/OLAM/Models/Rodin/Incoming/*.glb filter=lfs diff=lfs merge=lfs -text

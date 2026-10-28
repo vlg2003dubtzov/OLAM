@@ -51,6 +51,17 @@ namespace Olam.EditorTools
             tubeGo.GetComponent<MeshRenderer>().sharedMaterial =
                 CreateUrpLit("Mat_TandoorClay", new Color(0.55f, 0.35f, 0.22f));
 
+            // Модель Rodin, если префабы собраны (OLAM → Rodin → Build Prefabs): видимая стенка.
+            // Труба остаётся ради коллайдера, её отрисовка выключена. Модель — 0,9 м,
+            // труба — 1,1 м, поэтому экземпляр подогнан под трубу; свой коллайдер у него снят.
+            var shell = PlaceRodin("tandoor_a_body_left", tandoor.transform, Vector3.zero, 0f, 1.1f / 0.9f);
+            if (shell != null)
+            {
+                foreach (var col in shell.GetComponentsInChildren<Collider>())
+                    Object.DestroyImmediate(col);
+                tubeGo.GetComponent<MeshRenderer>().enabled = false;
+            }
+
             var thermal = tandoor.AddComponent<TandoorThermal>();
 
             var fuelZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -160,6 +171,21 @@ namespace Olam.EditorTools
                 CreateUrpLit("Mat_Water", new Color(0.3f, 0.55f, 0.85f));
             bowl.AddComponent<WaterBowl>();
 
+            // Стол с поленом — у дров, слева. Лепёшки — на столике справа: хлеб на землю не кладут.
+            PlaceRodin("work_table_table_with_log", null, new Vector3(-1.9f, 0f, 0.9f), 90f, 1f);
+            var nonStack = AssetDatabase.LoadAssetAtPath<GameObject>(RodinPrefabs + "non_stack_non_stack.prefab");
+            if (nonStack != null)
+            {
+                var nonTable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                nonTable.name = "NonTable";
+                nonTable.transform.position = new Vector3(1.75f, 0.35f, 0.9f);
+                nonTable.transform.localScale = new Vector3(0.7f, 0.7f, 0.5f);
+                // Mat_WoodTable общий с Топрак-калой: тот же цвет, что задаёт её сборщик
+                nonTable.GetComponent<MeshRenderer>().sharedMaterial =
+                    CreateUrpLit("Mat_WoodTable", new Color(0.4f, 0.28f, 0.15f));
+                PlaceRodin("non_stack_non_stack", null, new Vector3(1.75f, 0.7f, 0.9f), 0f, 1f);
+            }
+
             var tip = new GameObject("LearningTip");
             tip.transform.position = new Vector3(0f, 1.8f, 0f);
             tip.transform.localScale = Vector3.one * 0.01f;
@@ -184,6 +210,21 @@ namespace Olam.EditorTools
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
             Debug.Log($"OLAM: сцена сохранена → {ScenePath}. Play: ЛКМ — взять дрова/лепёшку.");
+        }
+
+        const string RodinPrefabs = "Assets/OLAM/Models/Rodin/Prefabs/";
+
+        /// <summary>Ставит префаб модели Rodin, если он уже собран; иначе null.</summary>
+        static GameObject PlaceRodin(string name, Transform parent, Vector3 localPos, float yaw, float scale)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(RodinPrefabs + name + ".prefab");
+            if (prefab == null) return null;
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            if (parent != null) go.transform.SetParent(parent, false);
+            go.transform.localPosition = localPos;
+            go.transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
+            go.transform.localScale = Vector3.one * scale;
+            return go;
         }
 
         static void EnsureFolders()
