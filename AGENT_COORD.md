@@ -11,8 +11,8 @@
 
 | Агент | Роль | Статус | Обновлено |
 |-------|------|--------|-----------|
-| **Cursor (Composer)** | Архитектура хаба/биомов, EcoScanner, контент-карточки | **READY TO BUILD** (меню в Unity) | 2026-10-28 |
-| **Claude Code** | Rodin GLB → разбор / импорт / расстановка в сценах | **DONE** (первые 5 GLB → префабы, сцена Tandoor); новые 5 — ждут решения автора | 2026-10-28 |
+| **Cursor (Composer)** | Gameplay/код + Blender MCP (`user-blender`, порт 9876) | **CONNECTED** | 2026-10-28 |
+| **Claude Code** | Blender → FBX/префабы, замена заглушек в сценах, окружение | **DONE** — сцены оформлены (см. лог) | 2026-10-28 |
 
 ## Зоны (locked)
 
@@ -20,7 +20,8 @@
 |------|----------|------|
 | Rodin / Incoming GLB | **Claude Code** | `Assets/OLAM/Models/Rodin/**` |
 | Шейдеры / Grass | **Cursor** | `Assets/OLAM/Shaders/**`, `Mat_Foliage*`, `Mat_Grass*` |
-| Nature gameplay (сканер, биомы, хаб-навигация) | **Cursor** | `Assets/OLAM/Nature/**`, `Core/Encyclopedia*`, `Core/ScenePortal*`, `Scenes/OlamHub*`, `Scenes/NatureDome*`, `Scenes/Biome_*`, `Editor/OlamNature*`, `Editor/OlamHub*`, `Docs/**` |
+| Nature gameplay (сканер, биомы, хаб-навигация) — код | **Cursor** | `Assets/OLAM/Nature/**`, `Core/Encyclopedia*`, `Core/ScenePortal*`, `Editor/OlamNature*`, `Editor/OlamHub*`, `Docs/**` |
+| Сцены биомов, хаба, тропы Чаткала + окружение (решение автора 2026-10-28) | **Claude Code** | `Scenes/Biome_*`, `Scenes/NatureDome*`, `Scenes/OlamHub*`, `Scenes/ChatkalNightTrail*`, `Assets/OLAM/Environment/**`. Cursor, пожалуйста, не пересобирайте эти сцены, пока статус Claude Code не DONE |
 | Kitchen / Tandoor | Claude Code (после моделей) или свободно | `Assets/OLAM/Kitchen/**`, `Scenes/Tandoor*` |
 | History / Toprak | свободно | `Assets/OLAM/History/**` |
 
@@ -29,10 +30,15 @@
 1. `EncyclopediaEntry` + biome/category/status/powerFact/interact*
 2. `BiomeDefinition` + сидер карточек ТЗ
 3. `EcoScanner` + `HologramCard` + `ScannableOrganism` + фильтр категорий
-4. Сцены: `NatureDome`, `Biome_Desert/Adyr/Mountains/Tugai`; Highlands → Chatkal
-5. `OlamHub`: Природа → Купол / Кухня / История
-6. Docs: `VR_ARCHITECTURE.md`, обновлены `AGENT_COORD` + `CLAUDE.md`
-7. **Не трогал** `Models/Rodin/**` (locked Claude Code)
+4. Сцены-заглушки (примитивы) — осознанно; без Blender MCP GLB не ставлю
+5. `OlamHub` / NatureDome / биомы — код и навигация; **сцены сейчас locked Claude Code**
+6. Docs: `VR_ARCHITECTURE.md`, `AGENT_COORD`, `CLAUDE.md`
+7. **Не трогаю** `Models/Rodin/**` и не пересобираю биом-сцены, пока Claude Code не DONE
+
+## Cursor — дальше (когда Claude Code положит префабы)
+
+- Навесить `ScannableOrganism` + Entry на `saxaul_black_*`, `tulip_greigii_*`, `snow_leopard_*`
+- Не звать `Build Nature Dome` поверх его расстановки
 
 ## Claude Code — просьба
 
@@ -59,9 +65,21 @@
 Все пути — от `Assets/OLAM/Models/Rodin/`. Реальные размеры: тандыр 0,9 м, столешница 0,78 м, лепёшки 0,3 м (уточнить), барс 0,66 м по макушке (холка ≈ 0,56 м).
 
 ### Claude Code log
-- Working on: ничего. Unity снова открыт по просьбе автора; префабы тюльпанов и саксаула собраны, всего 22. GUID прежних префабов не изменились, Console без ошибок.
+- Working on: ничего. Оформление сцен готово (2026-10-28, по решению автора).
+- **Оформление сцен** — `Assets/OLAM/Environment/Editor/OlamSceneDressing.cs`, меню **OLAM → Environment → Dress Scenes** (снимки — **Capture Previews** → `Temp/OLAM_Captures`):
+  - Сцены: хаб, купол, 4 биома, тропа Чаткала.
+  - Рельеф с землёй своего биома (меши в `Environment/Meshes`). Плоскость `Ground` осталась ради коллайдера, её отрисовка выключена.
+  - Трава — ваш `GrassPatch` с моими материалами.
+  - Камни, туман, вода в тугаях.
+  - Модели вместо капсул: `Scan_saxaul_black`, `Scan_tulip_greigii`, `Scan_snow_leopard` (тропа Чаткала). Капсула остаётся со сканером, коллайдером и маяком: у неё выключена только отрисовка, модель — дочерний `RodinModel`. Карточку и `ScannableOrganism` навешивать не нужно.
+  - Порталы — стрельчатые арки (пештак). Примитив остаётся ради клика, его не видно. Подписи стоят внутри арок, в ровном масштабе. Порталы ближе 3 м к камере (возврат в куполе) остались как были.
+  - Хаб: двор `Mat_Env_HubYard` вместо `Mat_HubFloor`; заголовок `HubTitle` поднят; у порталов — барс, тюльпаны, тандыр, стол.
+  - Всё добавленное лежит под корнем `OLAM_Dressing` и пересоздаётся при каждом запуске.
+  - **Cursor: после любого `Build …` для этих сцен запустите Dress Scenes ещё раз** (или вызовите `OlamSceneDressing.DressAll()` в конце сборщика), иначе оформление пропадёт.
+- Осталось без моделей (капсулы): `juzgun`, `cistanche`, `desert_monitor`, `toadhead_agama`, `eremurus`, `tulip_uzbekistanica`, `archa_juniper`, `malus_sieversii`, `turanga`, `bukhara_deer`.
+- Тропа Чаткала: у `AnimalSpawner` пусты `animalPrefab` и `entry`, поэтому после следов никто не появляется. Сейчас барс стоит на месте капсулы `Scan_snow_leopard`. Как связать его со спавнером, решайте вы, это геймплей.
 - Files locked: `Assets/OLAM/Models/Rodin/**`, `Assets/OLAM/Editor/OlamTandoorSceneBuilder.cs`.
-- Need from Cursor: повесить `ScannableOrganism` + карточку на префабы и расставить их в биомах. У всех префабов уже есть `BoxCollider`.
+- Need from Cursor: хук оформления после ваших сборщиков (см. выше); спавнер барса на тропе Чаткала.
   - `Prefabs/snow_leopard_*` → `Entry_SnowLeopard`, «Высокогорье».
   - `Prefabs/tulip_greigii_*` → `Entry_tulip_greigii`, «Адыры».
   - `Prefabs/saxaul_black_*` → `Entry_saxaul_black`, «Пустыня».
@@ -83,7 +101,7 @@
   - Git (по слову автора, 2026-10-28): исходники `Models/Rodin/Incoming/*.glb` хранятся в **Git LFS**; `git lfs install --local` уже выполнен. Вся история переписана, поэтому хеши сменились:
     - `948493d` → `3f9567e` — исходное состояние;
     - `bd170cb` — модели Rodin, префабы, сцена «Тандыр».
-    Старая история — в `refs/backup/main-before-lfs`. Правки Cursor (62 файла) не закоммичены и не тронуты.
+    Старая история — в `refs/backup/main-before-lfs`. Работа Cursor закоммичена отдельно: `53f31a6`, 18:11.
   - Подсказка `LearningTip` в сцене Tandoor огромная и закрывает обзор. Это кухня, поправлю, если автор скажет.
 
 ## Правила
