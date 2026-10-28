@@ -1,0 +1,25 @@
+# Текстовые файлы хранятся с LF, двоичные git распознаёт сам
+* text=auto eol=lf
+
+# Явно двоичные: модели, текстуры, звук, видео, шрифты, библиотеки
+*.glb binary
+*.fbx binary
+*.blend binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tga binary
+*.tif binary
+*.tiff binary
+*.psd binary
+*.exr binary
+*.hdr binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.webm binary
+*.mp4 binary
+*.ttf binary
+*.otf binary
+*.dll binary
+Assets/OLAM/Models/Rodin/Incoming/*.glb filter=lfs diff=lfs merge=lfs -text

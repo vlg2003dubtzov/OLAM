@@ -1,0 +1,86 @@
+# O'LAM — Образовательные Ландшафты Азии Международные (VR проект)
+# Unity 6 LTS, Universal Render Pipeline, XR Interaction Toolkit 3.x, OpenXR
+# (c) 2026 Проект OLAM
+## Общие правила
+- Язык кода: C# (Unity). Комментарии можно на русском.
+- Сериализуемые поля: SerializeField для всех настраиваемых параметров.
+- Методы, реагирующие на события XRI: public, префикс On.
+- Материалы: только URP/Lit.
+- Текст на трёх языках: LText (ru, uz, en).
+- Шрифты: TMP с кириллицей + узбекской латиницей (диапазон 20-7E,A0-FF,400-45F,2BB-2BC).
+## Структура проекта
+Assets/OLAM/
+  Core/          – ядро: локализация, энциклопедия, квесты, телепорты
+  Nature/        – природа: следы, флора, фонарик, день/ночь
+  History/       – история: сборка макета, переключение эпох
+  Kitchen/       – кухня: тандыр, выпечка, физика
+  Materials/     – URP/Lit-материалы
+  Scenes/        – сцены (Tandoor, ChatkalNightTrail, ToprakKala)
+  ScriptableObjects/ – EncyclopediaEntry
+## Основные классы
+### Core
+- LText – ru/uz/en + Get()
+- Localization – синглтон, событие Changed
+- LanguageSwitcher – кнопки
+- EncyclopediaEntry – ScriptableObject: id, title(LText), scientificName, description(LText), image, narration
+- InfoPanel – World Space Canvas, синглтон
+- QuestManager – Report(id, amount), onAllCompleted
+- TeleportToPoint – телепорт XR Origin
+### Nature
+- Flashlight – фонарик, список All, метод Illuminates(point)
+- RevealByLight – прозрачность/видимость под светом
+- AnimalTrack – след, Found после выбора
+- TrackTrail – цепочка следов, strictOrder, OnTrackFound → AnimalSpawner
+- Herbarium – синглтон, Register(entry)
+- PlantSpecimen – растение, isTarget = false для сравнения
+- DayNightController – переключение дня/ночи
+- AnimalSpawner – появление зверя, звук, квест
+### History
+- BuildSlot – гнездо, Open/Filled, Fill(BuildPiece)
+- BuildPiece – деталь, XRGrabInteractable + Rigidbody
+- ReconstructionManager – этапы сборки
+- EraSwitcher – руины <-> реконструкция
+### Kitchen
+- TandoorThermal – топка, дрова, теплоёмкость, сажа, ускорение
+- TandoorWallZone – триггер стенки, поза прилипания
+- Dough – лепёшка, влажность, запекание, Free/OnWall
+- Firewood – полено с массой
+- FuelZone – приём дров
+- WaterBowl – смачивание
+- TandoorControl – крышка/поддувало
+- TandoorGauge – табличка
+- TandoorFuelVisual – угли
+- TandoorMilestones – карточки физики
+### ProceduralTube – полый цилиндр
+## Настройки XR
+- XR Origin – Move Menu в сцене
+- XR Device Simulator включён (WASD, мышь, E)
+- Интеракторы: XR Simple Interactable / XR Grab Interactable
+- Throw On Detach только для Firewood
+- Профили: Oculus Touch / Pico 4 / HTC Vive
+## Рендеринг (URP)
+- Render Scale 0.6–0.75
+- Shadows: No Shadows
+- Ambient: Flat
+- Пост-обработка: выкл
+- Частицы: URP/Particles/Unlit, Additive
+## Локализация
+- Localization из Olam.Core
+- UI – TMP_Text
+- Карточки – EncyclopediaEntry
+- OnEnable/OnDisable виджетов
+## Распространённые ошибки
+1. Шрифт TMP не настроен – квадратики
+2. Материалы не Converted – розовый цвет
+3. ProceduralTube не обновлён – нажать Rebuild
+4. Лепёшка не падает – нет Rigidbody или IsTrigger
+5. Фонарь не светит – нет Light или включены тени
+6. Шлем не видит UI – добавить Tracked Device Graphic Raycaster
+## Генерация нового кода
+- Новые механики в соответствующих папках
+- MonoBehaviour
+- SerializeField
+- Три языка (LText)
+- AddListener в Awake/Start
+- Rigidbody при захвате/физике
+- Комментарии на русском для сложных мест
