@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5093346320a334141becebc244e3f1e5, type: 3}
+  m_Name: Entry_tulip_uzbekistanica
+  m_EditorClassIdentifier: Assembly-CSharp::Olam.Core.EncyclopediaEntry
+  id: tulip_uzbekistanica
+  title:
+    ru: "\u0422\u044E\u043B\u044C\u043F\u0430\u043D \u0443\u0437\u0431\u0435\u043A\u0438\u0441\u0442\u0430\u043D\u0441\u043A\u0438\u0439"
+    uz: "O\u2018zbekiston lolasii"
+    en: Uzbekistan tulip
+  scientificName: Tulipa uzbekistanica
+  description:
+    ru: "\u0423\u043D\u0438\u043A\u0430\u043B\u044C\u043D\u044B\u0439 \u044D\u043D\u0434\u0435\u043C\u0438\u043A! \u0420\u0430\u0441\u0442\u0451\u0442 \u0442\u043E\u043B\u044C\u043A\u043E \u0432 \u0423\u0437\u0431\u0435\u043A\u0438\u0441\u0442\u0430\u043D\u0435 (\u0421\u0443\u0440\u0445\u0430\u043D\u0434\u0430\u0440\u044C\u044F, \u041A\u0430\u0448\u043A\u0430\u0434\u0430\u0440\u044C\u044F) \u2014 \u0431\u043E\u043B\u044C\u0448\u0435 \u043D\u0438\u0433\u0434\u0435 \u043D\u0430 \u0417\u0435\u043C\u043B\u0435!"
+    uz: "Noyob endemik! Faqat O\u2018zbekistonda o\u2018sadi \u2014 Yerda boshqa joyda yo\u2018q!"
+    en: "Unique endemic! Grows only in Uzbekistan \u2014 nowhere else on Earth!"
+  image: {fileID: 0}
+  narration: {fileID: 0}
+  biome: 1
+  category: 1
+  status: 2
+  powerFact:
+    ru: "\u041D\u0430 \u043A\u0430\u0440\u0442\u0435 \u043C\u0438\u0440\u0430 \u2014 \u043E\u0434\u043D\u0430 \u0441\u0432\u0435\u0442\u044F\u0449\u0430\u044F\u0441\u044F \u0442\u043E\u0447\u043A\u0430."
+    uz: "Dunyo xaritasida bitta yorug\u2018 nuqta."
+    en: One glowing dot on the world map.
+  interactHint:
+    ru: "\u041A\u0430\u0440\u0442\u0430 \u043C\u0438\u0440\u0430"
+    uz: Dunyo xaritasi
+    en: World map
+  interactActionId: world_map

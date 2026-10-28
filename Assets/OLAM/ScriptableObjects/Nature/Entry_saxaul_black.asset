@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5093346320a334141becebc244e3f1e5, type: 3}
+  m_Name: Entry_saxaul_black
+  m_EditorClassIdentifier: Assembly-CSharp::Olam.Core.EncyclopediaEntry
+  id: saxaul_black
+  title:
+    ru: "\u0421\u0430\u043A\u0441\u0430\u0443\u043B \u0447\u0451\u0440\u043D\u044B\u0439"
+    uz: Qora saksovul
+    en: Black saxaul
+  scientificName: Haloxylon ammodendron
+  description:
+    ru: "\u0414\u0435\u0440\u0435\u0432\u043E \u0431\u0435\u0437 \u043B\u0438\u0441\u0442\u044C\u0435\u0432! \u0427\u0442\u043E\u0431\u044B \u043D\u0435 \u0442\u0435\u0440\u044F\u0442\u044C \u0432\u043E\u0434\u0443 \u043F\u0440\u0438 +50\xB0C, \u0434\u044B\u0448\u0438\u0442 \u0437\u0435\u043B\u0451\u043D\u044B\u043C\u0438 \u0432\u0435\u0442\u043E\u0447\u043A\u0430\u043C\u0438. \u041A\u043E\u0440\u043D\u0438 \u2014 \u0434\u043E 20 \u043C \u0432\u0433\u043B\u0443\u0431\u044C."
+    uz: "Barglari yo\u2018q daraxt! +50\xB0C da suvni saqlash uchun yashil novdalar bilan nafas oladi. Ildizlari 20 m gacha."
+    en: "A leafless tree! To save water at +50\xB0C it breathes through green twigs. Roots reach 20 m deep."
+  image: {fileID: 0}
+  narration: {fileID: 0}
+  biome: 0
+  category: 0
+  status: 0
+  powerFact:
+    ru: "\u041A\u043E\u0440\u043D\u0438 \u043F\u044C\u044E\u0442 \u0432\u043E\u0434\u0443 \u0441 \u0433\u043B\u0443\u0431\u0438\u043D\u044B 5-\u044D\u0442\u0430\u0436\u043D\u043E\u0433\u043E \u0434\u043E\u043C\u0430!"
+    uz: Ildizlari 5 qavatli uy chuqurligidan suv ichadi!
+    en: Roots drink from 5-storey depth!
+  interactHint:
+    ru: "\u0420\u0435\u043D\u0442\u0433\u0435\u043D \u043F\u0435\u0441\u043A\u0430"
+    uz: Qum rentgeni
+    en: Sand X-ray
+  interactActionId: xray_sand

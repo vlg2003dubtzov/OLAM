@@ -9,11 +9,26 @@ EditorBuildSettings:
     path: Assets/OLAM/Scenes/OlamHub.unity
     guid: 13e030aaddc7e1e44be209492e10eae7
   - enabled: 1
-    path: Assets/OLAM/Scenes/Tandoor.unity
-    guid: 041aefe25427b7a4bbe8fc4a1880abe8
+    path: Assets/OLAM/Scenes/NatureDome.unity
+    guid: ceaffe6bc47a94248b261c7f3908ca66
+  - enabled: 1
+    path: Assets/OLAM/Scenes/Biome_Desert.unity
+    guid: f602cef2810bfa5439753c8bd67f7221
+  - enabled: 1
+    path: Assets/OLAM/Scenes/Biome_Adyr.unity
+    guid: 44f923a21cf71514889d3b0e0476b3d1
+  - enabled: 1
+    path: Assets/OLAM/Scenes/Biome_Mountains.unity
+    guid: a491edba850128c499aabf0a96229db6
+  - enabled: 1
+    path: Assets/OLAM/Scenes/Biome_Tugai.unity
+    guid: 789e6c3f0a6fa7849a9eec5808d161c1
   - enabled: 1
     path: Assets/OLAM/Scenes/ChatkalNightTrail.unity
     guid: 45ddfe10b2d352f488d1bf63d638469d
+  - enabled: 1
+    path: Assets/OLAM/Scenes/Tandoor.unity
+    guid: 041aefe25427b7a4bbe8fc4a1880abe8
   - enabled: 1
     path: Assets/OLAM/Scenes/ToprakKala.unity
     guid: cb81bb8630842824bb00b61a6ec519ae

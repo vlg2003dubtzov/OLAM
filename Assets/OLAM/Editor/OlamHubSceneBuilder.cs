@@ -57,25 +57,26 @@ namespace Olam.EditorTools
             titleGo.AddComponent<Canvas>().renderMode = RenderMode.WorldSpace;
             var title = MakeTmp(titleGo.transform, "Text", Vector2.zero, 52);
             title.rectTransform.sizeDelta = new Vector2(900, 160);
-            title.text = "O'LAM\nОбразовательные Ландшафты Азии\nЛКМ по порталу — войти";
+            title.text = "O'LAM · Карта пространств\nПрирода → Кухня → История\nЛКМ по порталу — войти";
 
+            // Уровень 1: разделы. Природа ведёт в Купол (5 биомов), не сразу в сцену.
             var portals = new[]
             {
                 new PortalDef
                 {
-                    scene = "Tandoor",
-                    name = "Portal_Tandoor",
+                    scene = "NatureDome",
+                    name = "Portal_Nature",
                     pos = new Vector3(-3f, 0.6f, 1.5f),
-                    color = new Color(0.85f, 0.45f, 0.2f),
-                    label = new LText("Тандыр\nКухня", "Tandir\nOshxona", "Tandoor\nKitchen")
+                    color = new Color(0.3f, 0.65f, 0.4f),
+                    label = new LText("Природа\nКупол биомов", "Tabiat\nBiomlar", "Nature\nBiome Dome")
                 },
                 new PortalDef
                 {
-                    scene = "ChatkalNightTrail",
-                    name = "Portal_Chatkal",
+                    scene = "Tandoor",
+                    name = "Portal_Tandoor",
                     pos = new Vector3(0f, 0.6f, 2.5f),
-                    color = new Color(0.25f, 0.35f, 0.75f),
-                    label = new LText("Чаткал\nНочная тропа", "Chatqol\nTungi iz", "Chatkal\nNight Trail")
+                    color = new Color(0.85f, 0.45f, 0.2f),
+                    label = new LText("Кухня\nТандыр", "Oshxona\nTandir", "Kitchen\nTandoor")
                 },
                 new PortalDef
                 {
@@ -83,7 +84,7 @@ namespace Olam.EditorTools
                     name = "Portal_ToprakKala",
                     pos = new Vector3(3f, 0.6f, 1.5f),
                     color = new Color(0.75f, 0.62f, 0.3f),
-                    label = new LText("Топрак-Кала\nИстория", "Topraqqal’a\nTarix", "Toprak-Kala\nHistory")
+                    label = new LText("История\nТопрак-Кала", "Tarix\nTopraqqal’a", "History\nToprak-Kala")
                 }
             };
 
@@ -167,8 +168,13 @@ namespace Olam.EditorTools
             var paths = new[]
             {
                 HubPath,
-                "Assets/OLAM/Scenes/Tandoor.unity",
+                "Assets/OLAM/Scenes/NatureDome.unity",
+                "Assets/OLAM/Scenes/Biome_Desert.unity",
+                "Assets/OLAM/Scenes/Biome_Adyr.unity",
+                "Assets/OLAM/Scenes/Biome_Mountains.unity",
+                "Assets/OLAM/Scenes/Biome_Tugai.unity",
                 "Assets/OLAM/Scenes/ChatkalNightTrail.unity",
+                "Assets/OLAM/Scenes/Tandoor.unity",
                 "Assets/OLAM/Scenes/ToprakKala.unity"
             };
 

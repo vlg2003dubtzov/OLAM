@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5093346320a334141becebc244e3f1e5, type: 3}
+  m_Name: Entry_cistanche
+  m_EditorClassIdentifier: Assembly-CSharp::Olam.Core.EncyclopediaEntry
+  id: cistanche
+  title:
+    ru: "\u0426\u0438\u0441\u0442\u0430\u043D\u0445\u0435 \u0441\u043E\u043B\u043E\u043D\u0447\u0430\u043A\u043E\u0432\u0430\u044F"
+    uz: "Sho\u2018rxok sistanshe"
+    en: Desert cistanche
+  scientificName: Cistanche salsa
+  description:
+    ru: "\u0420\u0430\u0441\u0442\u0435\u043D\u0438\u0435-\u043F\u0438\u0440\u0430\u0442! \u0411\u0435\u0440\u0451\u0442 \u0432\u043E\u0434\u0443 \u0443 \u043A\u043E\u0440\u043D\u0435\u0439 \u0441\u0430\u043A\u0441\u0430\u0443\u043B\u0430. \u0426\u0432\u0435\u0442\u0451\u0442 \u0440\u0430\u0437 \u0432 \u0433\u043E\u0434\u0443 \u044F\u0440\u043A\u043E\u0439 \u0441\u0432\u0435\u0447\u043E\u0439."
+    uz: "Qaroqchi o\u2018simlik! Saksovul ildizidan suv oladi. Yilda bir marta shamdek gullaydi."
+    en: A pirate plant! It steals water from saxaul roots. Blooms once a year like a bright torch.
+  image: {fileID: 0}
+  narration: {fileID: 0}
+  biome: 0
+  category: 1
+  status: 0
+  powerFact:
+    ru: "\u0421\u0432\u044F\u0437\u044C \u0441 \u0441\u0430\u043A\u0441\u0430\u0443\u043B\u043E\u043C \u043F\u043E\u0434 \u043F\u0435\u0441\u043A\u043E\u043C."
+    uz: "Qum ostida saksovul bilan bog\u2018lanish."
+    en: Hidden link to saxaul under sand.
+  interactHint:
+    ru: "\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u0441\u0432\u044F\u0437\u044C"
+    uz: "Bog\u2018lanishni ko\u2018rsat"
+    en: Show link
+  interactActionId: show_link
