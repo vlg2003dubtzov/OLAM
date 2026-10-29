@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Olam.Core;
 using Olam.Nature;
+using Olam.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -25,7 +26,8 @@ namespace Olam.EditorTools
         const string Prefabs = "Assets/OLAM/Models/Rodin/Prefabs/";
         const string Env = "Assets/OLAM/Environment";
         const string RootName = "OLAM_Dressing";
-        const string CaptureDir = "Temp/OLAM_Captures";
+        // не в Temp: Unity стирает Temp при выходе, а снимки из запуска без окна нужны и после него
+        internal const string CaptureDir = "Logs/OLAM_Captures";
 
         static readonly string[] Scenes =
             { "OlamHub", "NatureDome", "Biome_Desert", "Biome_Adyr", "Biome_Mountains", "Biome_Tugai", "ChatkalNightTrail" };
@@ -148,13 +150,7 @@ namespace Olam.EditorTools
         static void DressDome(Scene scene)
         {
             var root = NewRoot(scene);
-            // у каждого портала — маленький образ того, что внутри
-            Preview(scene, root, "Portal_Biome_Desert", 0.35f, ("saxaul_black_small", Vector3.zero, 20f));
-            Preview(scene, root, "Portal_Biome_Adyr", 1.4f, Tulips());
-            Preview(scene, root, "Portal_ChatkalNightTrail", 0.8f, ("snow_leopard_stand", Vector3.zero, 160f));
-            var mountains = Find(scene, "Portal_Biome_Mountains");
-            if (mountains != null)
-                RockAt(root, InFront(mountains.transform.position), 0.6f, 0);
+            // купол — меню биомов: только арки, модели видов живут в самих биомах (решение автора)
             ArchPortals(scene, root);
         }
 
@@ -170,38 +166,34 @@ namespace Olam.EditorTools
             var rng = new System.Random(55);
             Grass(root, rng, GrassMat("Mat_Env_GrassAdyr", new Color(0.24f, 0.52f, 0.14f), new Color(0.66f, 0.84f, 0.30f)),
                 14, 0f, 220, 2.4f, new Vector2(0.18f, 0.40f), 16f, 24f);
-            Scatter(scene, root, relief, rng, "saxaul_black_large", 3, 30f, 55f, 0.8f, 1.1f);
             Rocks(root, relief, rng, 10, 18f, 50f, 0.5f, 2.2f);
-
-            // у порталов — то, что за ними
-            PlaceAt(scene, root, "Hub_Nature_Leopard", new Vector3(-1.85f, 0f, 1.3f), 200f, 1f, ("snow_leopard_stand", Vector3.zero, 0f));
-            PlaceAt(scene, root, "Hub_Nature_Tulips", new Vector3(-4.1f, 0f, 1.1f), 0f, 1.5f, Tulips());
-            PlaceAt(scene, root, "Hub_Tandoor", new Vector3(1.15f, 0f, 2.4f), 0f, 0.8f, ("tandoor_a_body_left", Vector3.zero, 0f));
-            PlaceAt(scene, root, "Hub_WorkTable", new Vector3(-1.5f, 0f, 2.7f), 70f, 0.6f, ("work_table_table_with_log", Vector3.zero, 0f));
+            // модели видов и предметов в меню не ставим, даже вдали: они — часть миссий внутри пространств (решение автора)
 
             // двор караван-сарая — светлый камень вместо тёмной плоскости
             var floor = Find(scene, "Hub_Floor");
             if (floor != null && floor.TryGetComponent<MeshRenderer>(out var floorRenderer))
                 floorRenderer.sharedMaterial = GroundMat("Mat_Env_HubYard",
                     new Color(0.74f, 0.67f, 0.55f), new Color(0.56f, 0.50f, 0.41f), 9f);
-            // заголовок хаба — выше арок (холст в мире: поле пишется напрямую)
-            if (Find(scene, "HubTitle") is GameObject title && title.transform is RectTransform titleRect)
-            {
-                var so = new SerializedObject(titleRect);
-                so.FindProperty("m_AnchoredPosition").vector2Value = new Vector2(titleRect.anchoredPosition.x, 3.15f);
-                so.ApplyModifiedPropertiesWithoutUndo();
-            }
-            ArchPortals(scene, root);
+            // заголовок хаба заменили титул и подсказка меню
+            if (Find(scene, "HubTitle") is GameObject title) title.SetActive(false);
+
+            // плашки — интерфейс: обложка пространства в арке, титул, плашка при наведении, экран загрузки
+            var covered = new List<(ScenePortal, Renderer, SpaceInfo)>();
+            ArchPortals(scene, root, OlamMenuUiBuilder.EnsureSpaces(), covered);
+            OlamMenuUiBuilder.AddHubMenu(root, covered);
         }
 
         // ---------- порталы-арки ----------
 
         /// <summary>
         /// Стрельчатая арка (пештак, как в знаке OLAM) вокруг каждого портала: глиняная рама и панель цвета
-        /// портала внутри. Примитив портала остаётся ради коллайдера (клик), его не видно; подпись — над аркой.
+        /// портала внутри. Примитив портала остаётся ради коллайдера (клик), его не видно; подпись — в проёме.
+        /// Если у сцены портала есть карточка в covers, в проёме — обложка пространства, арка крупнее,
+        /// подпись над ней, кликается весь проём; такие порталы попадают в covered.
         /// Порталы ближе 3 м к камере не трогает: арка закрыла бы вид.
         /// </summary>
-        static void ArchPortals(Scene scene, Transform root)
+        static void ArchPortals(Scene scene, Transform root, Dictionary<string, SpaceInfo> covers = null,
+            List<(ScenePortal, Renderer, SpaceInfo)> covered = null)
         {
             var cam = FindCamera(scene);
             var clay = ClayMat("Mat_Env_ArchClay", new Color(0.64f, 0.28f, 0.16f));
@@ -225,8 +217,10 @@ namespace Olam.EditorTools
                         continue;
                     }
 
-                    float width = Mathf.Max(1.3f, Mathf.Max(size.x, size.z) + 0.35f);
-                    float height = width * 1.5f;
+                    SpaceInfo space = null;
+                    covers?.TryGetValue(new SerializedObject(portal).FindProperty("sceneName").stringValue, out space);
+                    float width = Mathf.Max(space != null ? 2.1f : 1.3f, Mathf.Max(size.x, size.z) + 0.35f);
+                    float height = width * (space != null ? 1.35f : 1.5f);
                     var (frame, panel) = ArchMeshes(width, height);
                     var arch = new GameObject("Arch_" + portal.name);
                     arch.transform.SetParent(group, false);
@@ -236,15 +230,98 @@ namespace Olam.EditorTools
                     var inner = new GameObject("Panel");
                     inner.transform.SetParent(arch.transform, false);
                     inner.AddComponent<MeshFilter>().sharedMesh = panel;
-                    inner.AddComponent<MeshRenderer>().sharedMaterial = mr.sharedMaterial;
+                    var innerRenderer = inner.AddComponent<MeshRenderer>();
+                    innerRenderer.sharedMaterial = space != null ? CoverMat(space, panel.bounds) : mr.sharedMaterial;
                     mr.enabled = false;
 
-                    // подпись — вывеска внутри проёма, перед панелью
                     float depth = Mathf.Max(0.25f, width * 0.22f);
-                    SetLabel(portal.transform.Find("Label") as RectTransform,
-                        arch.transform.TransformPoint(new Vector3(0f, height * 0.5f, -(depth * 0.5f + 0.06f))),
-                        arch.transform.rotation);
+                    var label = portal.transform.Find("Label") as RectTransform;
+                    if (space == null)
+                    {
+                        // подпись — вывеска внутри проёма, перед панелью
+                        SetLabel(label, arch.transform.TransformPoint(new Vector3(0f, height * 0.5f, -(depth * 0.5f + 0.06f))),
+                            arch.transform.rotation);
+                        continue;
+                    }
+                    // обложка — окно в мир пространства: над аркой название пространства, кликается весь проём.
+                    // Подпись параллельна экрану камеры: повёрнутая вместе с боковой аркой, она в перспективе кренится
+                    var labelPos = arch.transform.TransformPoint(new Vector3(0f, height + 0.38f, -(depth * 0.5f + 0.06f)));
+                    SetLabel(label, labelPos, cam != null ? cam.transform.rotation : arch.transform.rotation);
+                    Retitle(portal, space.title);
+                    HitBox(portal, arch.transform, panel.bounds);
+                    covered?.Add((portal, innerRenderer, space));
                 }
+        }
+
+        /// <summary>Подпись портала — название пространства из его карточки; язык ScenePortal переключает сам.</summary>
+        static void Retitle(ScenePortal portal, LText title)
+        {
+            var so = new SerializedObject(portal);
+            var label = so.FindProperty("label");
+            label.FindPropertyRelative("ru").stringValue = title.ru;
+            label.FindPropertyRelative("uz").stringValue = title.uz;
+            label.FindPropertyRelative("en").stringValue = title.en;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            if (so.FindProperty("labelText").objectReferenceValue is TMPro.TMP_Text text)
+            {
+                var textSo = new SerializedObject(text);
+                textSo.FindProperty("m_text").stringValue = title.ru;
+                textSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        /// <summary>
+        /// Обложка в проёме арки: без освещения, во всю высоту проёма, лишнее по бокам обрезано вокруг фокуса.
+        /// UV панели — метры (x от середины, y от пола), тайлинг материала переводит их в доли картинки.
+        /// </summary>
+        static Material CoverMat(SpaceInfo space, Bounds opening)
+        {
+            string name = "Mat_Env_Cover_" + space.sceneName;
+            string path = $"{Env}/Materials/{name}.mat";
+            var m = Load<Material>(path);
+            if (m == null)
+            {
+                m = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { name = name };
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.SetTexture("_BaseMap", space.cover);
+            m.SetColor("_BaseColor", Color.white);
+            float w = opening.size.x, h = opening.size.y;
+            float art = space.cover != null ? space.cover.width / (float)space.cover.height : 1f;
+            Vector2 scale, offset;
+            if (w / h < art)
+            {
+                scale = new Vector2(1f / (h * art), 1f / h);
+                float half = w * scale.x * 0.5f;
+                offset = new Vector2(Mathf.Clamp(space.focus.x, half, 1f - half), 0f);
+            }
+            else
+            {
+                scale = new Vector2(1f / w, art / w);
+                float half = h * scale.y * 0.5f;
+                offset = new Vector2(0.5f, Mathf.Clamp(space.focus.y, half, 1f - half) - half);
+            }
+            m.SetTextureScale("_BaseMap", scale);
+            m.SetTextureOffset("_BaseMap", offset);
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        /// <summary>Коллайдер клика по всему проёму — на самом портале: OlamInteractable ловит попадания в себя и детей.</summary>
+        static void HitBox(Component portal, Transform arch, Bounds opening)
+        {
+            if (!portal.TryGetComponent<BoxCollider>(out var box)) box = portal.gameObject.AddComponent<BoxCollider>();
+            Vector3 min = Vector3.positiveInfinity, max = Vector3.negativeInfinity;
+            foreach (float x in new[] { opening.min.x, opening.max.x })
+                foreach (float y in new[] { opening.min.y, opening.max.y })
+                    foreach (float z in new[] { -0.05f, 0.05f })
+                    {
+                        var p = portal.transform.InverseTransformPoint(arch.TransformPoint(new Vector3(x, y, z)));
+                        min = Vector3.Min(min, p);
+                        max = Vector3.Max(max, p);
+                    }
+            box.center = (min + max) * 0.5f;
+            box.size = max - min;
         }
 
         /// <summary>
@@ -747,14 +824,9 @@ namespace Olam.EditorTools
                     if (g.activeSelf) { g.SetActive(false); hidden.Add(g); }
             }
             var overview = new GameObject("CaptureOverview").AddComponent<Camera>();
-            // трава рисуется в LateUpdate (DrawMeshInstanced); в редакторе снимок его не вызывает — вызываем сами
-            var lateUpdate = typeof(GrassPatch).GetMethod("LateUpdate",
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
             try
             {
-                foreach (var g in scene.GetRootGameObjects())
-                    foreach (var patch in g.GetComponentsInChildren<GrassPatch>())
-                        lateUpdate?.Invoke(patch, null);
+                PrepareCapture(scene);
                 Shoot(cam, $"{CaptureDir}/{name}.png");
                 overview.CopyFrom(cam);
                 overview.transform.SetPositionAndRotation(new Vector3(0f, 7f, -18f), Quaternion.Euler(18f, 0f, 0f));
@@ -767,7 +839,17 @@ namespace Olam.EditorTools
             }
         }
 
-        static void Shoot(Camera cam, string path)
+        /// <summary>Трава рисуется в LateUpdate (DrawMeshInstanced); в редакторе снимок его не вызывает — вызываем сами.</summary>
+        internal static void PrepareCapture(Scene scene)
+        {
+            var lateUpdate = typeof(GrassPatch).GetMethod("LateUpdate",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            foreach (var g in scene.GetRootGameObjects())
+                foreach (var patch in g.GetComponentsInChildren<GrassPatch>())
+                    lateUpdate?.Invoke(patch, null);
+        }
+
+        internal static void Shoot(Camera cam, string path)
         {
             var rt = new RenderTexture(1280, 720, 24);
             var prev = cam.targetTexture;
@@ -793,7 +875,7 @@ namespace Olam.EditorTools
 
         // ---------- служебное ----------
 
-        static void InScene(string name, bool save, System.Action<Scene> body)
+        internal static void InScene(string name, bool save, System.Action<Scene> body)
         {
             string path = $"Assets/OLAM/Scenes/{name}.unity";
             if (!File.Exists(path)) return;

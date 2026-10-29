@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f3c3bb675aebef4894d4c0efa3b2d1e, type: 3}
+  m_Name: Space_Tandoor
+  m_EditorClassIdentifier: Assembly-CSharp::Olam.UI.SpaceInfo
+  sceneName: Tandoor
+  cover: {fileID: 2800000, guid: 83800002264ea31498f4e78aa2733d4f, type: 3}
+  focus: {x: 0.5, y: 0.56}
+  title:
+    ru: "\u0422\u0430\u043D\u0434\u044B\u0440"
+    uz: Tandir
+    en: Tandoor
+  kicker:
+    ru: "\u041A\u0443\u0445\u043D\u044F \xB7 \u0425\u043B\u0435\u0431 \u0438\u0437 \u0433\u043B\u0438\u043D\u044F\u043D\u043E\u0439 \u043F\u0435\u0447\u0438"
+    uz: "Oshxona \xB7 Loy tandirda non"
+    en: "Kitchen \xB7 Bread from a clay oven"
+  question:
+    ru: "\u041F\u043E\u0447\u0435\u043C\u0443 \u043B\u0435\u043F\u0451\u0448\u043A\u0430 \u0434\u0435\u0440\u0436\u0438\u0442\u0441\u044F \u043D\u0430 \u0441\u0442\u0435\u043D\u043A\u0435 \u0442\u0430\u043D\u0434\u044B\u0440\u0430 \u0438 \u043D\u0435 \u043F\u0430\u0434\u0430\u0435\u0442 \u0432 \u043E\u0433\u043E\u043D\u044C?"
+    uz: Nega non tandir devorida ushlanib turadi va olovga tushmaydi?
+    en: Why does the flatbread stay on the tandoor wall instead of falling into the fire?
