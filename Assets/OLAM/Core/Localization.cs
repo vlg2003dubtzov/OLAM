@@ -20,7 +20,8 @@ namespace Olam.Core
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(gameObject);
+                // только сам дубликат: на том же объекте сцены бывают QuestManager и другие системы
+                Destroy(this);
                 return;
             }
 

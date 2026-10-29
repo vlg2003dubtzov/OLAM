@@ -22,7 +22,8 @@
 | Шейдеры / Grass | **Cursor** | `Assets/OLAM/Shaders/**`, `Mat_Foliage*`, `Mat_Grass*` |
 | Nature gameplay (сканер, биомы, хаб-навигация) — код | **Cursor** | `Assets/OLAM/Nature/**`, `Core/Encyclopedia*`, `Core/ScenePortal*`, `Editor/OlamNature*`, `Editor/OlamHub*`, `Docs/**` |
 | Сцены биомов, хаба, тропы Чаткала + окружение (решение автора 2026-10-28) | **Claude Code** | `Scenes/Biome_*`, `Scenes/NatureDome*`, `Scenes/OlamHub*`, `Scenes/ChatkalNightTrail*`, `Assets/OLAM/Environment/**`. Cursor, пожалуйста, не пересобирайте эти сцены, пока статус Claude Code не DONE |
-| Kitchen / Tandoor | Claude Code (после моделей) или свободно | `Assets/OLAM/Kitchen/**`, `Scenes/Tandoor*` |
+| Интерфейс меню: плашки, титул, экран загрузки (2026-10-29, по просьбе автора) | **Claude Code** | `Assets/OLAM/UI/**` |
+| Kitchen / Tandoor — миссия «Первая лепёшка» (2026-10-29, по слову автора) | **Claude Code** | `Assets/OLAM/Kitchen/**`, `Scenes/Tandoor*`, `Editor/OlamTandoorSceneBuilder.cs` |
 | History / Toprak | свободно | `Assets/OLAM/History/**` |
 
 ## Cursor — сделано (фаза 2: архитектура «Живой Узбекистан»)
@@ -66,14 +67,31 @@
 
 ### Claude Code log
 - Working on: ничего. Оформление сцен готово (2026-10-28, по решению автора).
-- **Оформление сцен** — `Assets/OLAM/Environment/Editor/OlamSceneDressing.cs`, меню **OLAM → Environment → Dress Scenes** (снимки — **Capture Previews** → `Temp/OLAM_Captures`):
+- **Оформление сцен** — `Assets/OLAM/Environment/Editor/OlamSceneDressing.cs`, меню **OLAM → Environment → Dress Scenes** (снимки — **Capture Previews** → `Logs/OLAM_Captures`):
   - Сцены: хаб, купол, 4 биома, тропа Чаткала.
   - Рельеф с землёй своего биома (меши в `Environment/Meshes`). Плоскость `Ground` осталась ради коллайдера, её отрисовка выключена.
   - Трава — ваш `GrassPatch` с моими материалами.
   - Камни, туман, вода в тугаях.
   - Модели вместо капсул: `Scan_saxaul_black`, `Scan_tulip_greigii`, `Scan_snow_leopard` (тропа Чаткала). Капсула остаётся со сканером, коллайдером и маяком: у неё выключена только отрисовка, модель — дочерний `RodinModel`. Карточку и `ScannableOrganism` навешивать не нужно.
   - Порталы — стрельчатые арки (пештак). Примитив остаётся ради клика, его не видно. Подписи стоят внутри арок, в ровном масштабе. Порталы ближе 3 м к камере (возврат в куполе) остались как были.
-  - Хаб: двор `Mat_Env_HubYard` вместо `Mat_HubFloor`; заголовок `HubTitle` поднят; у порталов — барс, тюльпаны, тандыр, стол.
+  - Хаб: двор `Mat_Env_HubYard` вместо `Mat_HubFloor`; заголовок `HubTitle` поднят.
+  - **Плашки — интерфейс игры (2026-10-29, по просьбе автора)**, код в `Assets/OLAM/UI`:
+    - картинки автора лежат в `UI/Covers`; карточки пространств `SpaceInfo` (сцена, обложка, название, вопрос урока) — в `UI/Spaces`;
+    - в хабе `OlamHubMenu` (под `OLAM_Dressing`) показывает титул с главной плашкой, раз за запуск;
+    - в каждой арке хаба — обложка своего пространства; клик по всему проёму, над аркой название, при наведении — плашка с вопросом урока;
+    - при входе — `OlamLoadingScreen`: обложка во весь экран, гаснет уже в новой сцене;
+    - `ScenePortal` не тронут: меню слушает тот же `OlamInteractable.Selected`. Подписи порталов хаба оформление меняет на названия из `SpaceInfo`, `HubTitle` выключен;
+    - снимки: **OLAM → UI → Capture Menu** → `Logs/OLAM_Captures/ui_*.png`.
+  - **Миссия «Первая лепёшка» в «Тандыре» (2026-10-29, по слову автора)** — сцену строит `OlamTandoorSceneBuilder`:
+    - восемь шагов — цели `QuestManager` на объекте `OLAM_Quests`: `fuel`, `heat`, `stamp`, `wet`, `stick`, `bake_bread`, `take_out`, `serve`;
+    - предмет берут ЛКМ и отпускают над целью: `KitchenItem` + `IKitchenTarget` (топка, миска, подушка, стенка, тесто для чекича, дастархан). Не принял никто — тесто и инструменты возвращаются на стол;
+    - камера заглядывает в устье (`KitchenCameraRig`) сама, когда лепёшку прилепили, и по клику на тандыр;
+    - модель тандыра Rodin сплошная, выемка глубиной ~0,1 м. Дно вырезано (`Environment/Meshes/Tandoor_a_body_open.asset`), под ним труба `ProceduralTube` — внутренняя стенка, на ней печётся лепёшка;
+    - панель шагов, карточки урока, «Во двор» и финал — `UI/OlamMissionPanel`;
+    - самопроверка без окна: `Builds/Windows/OLAM.exe -batchmode -nographics -olamSelfTest -logFile путь` → в журнале `OLAM SELFTEST PASS` (`Kitchen/KitchenSelfTest.cs`).
+  - **Исправлено в `Core/Localization.cs`:** дубликат удалял весь свой объект (`Destroy(gameObject)`). При входе из хаба вместе с ним пропадал `QuestManager` на том же `OLAM_Systems` — в тропе Чаткала, биомах, Топрак-кале и Тандыре. Теперь `Destroy(this)`. Cursor, учтите в своих сборщиках.
+  - Для Cursor: `GrassPatch` без видеокарты (`-nographics`) бросает «Instancing is not supported» каждый кадр — стоит проверять `SystemInfo.supportsInstancing`.
+  - **Решение автора (2026-10-29): в хабе и куполе моделей нет.** Барс, тандыр, саксаул, тюльпаны и другие предметы — часть миссий внутри пространств, а не украшение меню. Окружение главного меню будет переделано (концепт — у автора на согласовании). Не ставьте модели Rodin в `OlamHub` и `NatureDome`.
   - Всё добавленное лежит под корнем `OLAM_Dressing` и пересоздаётся при каждом запуске.
   - **Cursor: после любого `Build …` для этих сцен запустите Dress Scenes ещё раз** (или вызовите `OlamSceneDressing.DressAll()` в конце сборщика), иначе оформление пропадёт.
 - Осталось без моделей (капсулы): `juzgun`, `cistanche`, `desert_monitor`, `toadhead_agama`, `eremurus`, `tulip_uzbekistanica`, `archa_juniper`, `malus_sieversii`, `turanga`, `bukhara_deer`.

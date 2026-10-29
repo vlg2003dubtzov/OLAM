@@ -5,12 +5,15 @@ using Olam.Core;
 namespace Olam.Kitchen
 {
     /// <summary>
-    /// Табличка температуры / сажи.
+    /// Градусник тандыра: температура стенок и готовность печи словами.
     /// </summary>
     public class TandoorGauge : MonoBehaviour
     {
         [SerializeField] TMP_Text label;
         [SerializeField] LText title = new LText("Тандыр", "Tandir", "Tandoor");
+        [SerializeField] LText cold = new LText("холодный", "sovuq", "cold");
+        [SerializeField] LText heating = new LText("греется", "qizimoqda", "heating up");
+        [SerializeField] LText ready = new LText("готов", "tayyor", "ready");
 
         TandoorThermal cached;
 
@@ -32,7 +35,9 @@ namespace Olam.Kitchen
         {
             cached = thermal;
             if (label == null || thermal == null) return;
-            label.text = $"{title.Get()}\n{thermal.Temperature:0}°C\nsoot {thermal.Soot:0%}";
+            var word = thermal.Temperature >= thermal.ReadyTemp ? ready
+                : thermal.Burning || thermal.Temperature > 60f ? heating : cold;
+            label.text = $"{title.Get()}\n{thermal.Temperature:0} °C\n{word.Get()}";
         }
     }
 }

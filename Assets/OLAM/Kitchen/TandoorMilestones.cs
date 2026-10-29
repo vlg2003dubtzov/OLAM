@@ -53,6 +53,12 @@ namespace Olam.Kitchen
 
         void Show(Card card)
         {
+            // своей таблички в мире нет — карточка уходит на панель миссии
+            if (cardRoot == null && cardTitle == null)
+            {
+                Olam.UI.OlamMissionPanel.ShowCard(card.title, card.body);
+                return;
+            }
             if (cardRoot != null) cardRoot.SetActive(true);
             if (cardTitle != null) cardTitle.text = card.title.Get();
             if (cardBody != null) cardBody.text = card.body.Get();
@@ -60,6 +66,7 @@ namespace Olam.Kitchen
 
         void RefreshVisible()
         {
+            if (cardRoot == null && cardTitle == null) return;   // панель миссии переводит свою карточку сама
             foreach (var card in cards)
             {
                 if (!card.shown) continue;
